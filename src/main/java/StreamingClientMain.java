@@ -31,7 +31,7 @@ public class StreamingClientMain {
     // --- Configuration ---
     final static int CAMERA_DEVICE_INDEX = 0;
     // MediaMTX로 보낼 RTMP 설정
-    final static String RTMP_PUBLISH_URL = "rtmp://localhost:1935/live"; // MediaMTX가 수신할 RTMP 주소 (경로 'live'는 예시)
+    final static String RTMP_PUBLISH_URL = "rtmp://localhost:11935/live"; // MediaMTX가 수신할 RTMP 주소 (경로 'live'는 예시)
     // MediaMTX가 제공할 RTSP URL (클라이언트가 접속할 주소) - 이 주소를 서버에 등록
     final static String RTSP_ACCESS_PATH = "/live"; // RTMP와 동일한 경로 사용
     final static int MEDIAMTX_RTSP_PORT = 8554;   // MediaMTX의 기본 RTSP 포트

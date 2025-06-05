@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HLS Player Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <h1>My HLS Stream Test</h1>
+    <video id="hlsVideo" controls width="720" muted autoplay></video>
+    <script>
+      var video = document.getElementById('hlsVideo');
+      var hlsUrl = 'http://192.168.0.236:18888/live/index.m3u8'; // HLS 스트림 주소
+
+      if (Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+          console.log("Manifest parsed, attempting to play video.");
+          video.play().catch(e => console.error("Autoplay failed:", e));
+        });
+        hls.on(Hls.Events.ERROR, function (event, data) {
+          console.error('HLS.js error:', data);
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS support (e.g., Safari)
+        video.src = hlsUrl;
+        video.addEventListener('loadedmetadata', function() {
+          video.play().catch(e => console.error("Autoplay failed:", e));
+        });
+      } else {
+        console.error("HLS is not supported in this browser.");
+      }
+    </script>
+</body>
+</html>
