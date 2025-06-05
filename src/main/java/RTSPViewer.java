@@ -11,8 +11,8 @@ public class RTSPViewer {
         // 1. RTSP 스트림 URL 설정
         // "<YOUR_MACBOOK_IP_HERE>" 부분을 실제 RTSP 서버가 실행 중인 맥북의 IP 주소로 변경하세요.
         // 만약 이 뷰어 프로그램을 RTSP 서버와 동일한 컴퓨터에서 실행한다면 "localhost"로 사용할 수 있습니다.
-//        String rtspUrl = "rtsp://192.168.0.236:8554/live";
-        String rtspUrl = "rtsp://localhost:8554/live";
+        String rtspUrl = "rtsp://192.168.0.152:8554/live";
+//        String rtspUrl = "rtsp://localhost:8554/live";
         // 예시: String rtspUrl = "rtsp://192.168.0.10:8554/live";
         // 예시: String rtspUrl = "rtsp://localhost:8554/live";
 
