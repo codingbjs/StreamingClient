@@ -34,7 +34,7 @@ public class StreamingClientMain {
     final static String RTMP_PUBLISH_URL = "rtmp://localhost:11935/live"; // MediaMTX가 수신할 RTMP 주소 (경로 'live'는 예시)
     // MediaMTX가 제공할 RTSP URL (클라이언트가 접속할 주소) - 이 주소를 서버에 등록
     final static String RTSP_ACCESS_PATH = "/live"; // RTMP와 동일한 경로 사용
-    final static int MEDIAMTX_RTSP_PORT = 8554;   // MediaMTX의 기본 RTSP 포트
+    final static int MEDIAMTX_RTSP_PORT = 18554;   // MediaMTX의 기본 RTSP 포트
 
     final static int VIDEO_BITRATE = 2000000; // 2 Mbps
     final static double FRAME_RATE = 30.0;    // Target FPS
