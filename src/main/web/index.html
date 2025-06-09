@@ -1,68 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HLS Player Test</title>
+    <title>HLS Player Test (Hardcoded)</title>
+    <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
 <h1>My HLS Stream Test</h1>
-<video id="hlsVideo" controls width="720" muted autoplay></video>
+<video id="hlsVideo" controls width="720" muted autoplay playsinline></video>
 <script>
     var video = document.getElementById('hlsVideo');
-    var hlsUrl = 'http://192.168.0.236:28888/live/index.m3u8'; // HLS 스트림 주소
 
-    // --- [추가] 인증 정보 설정 시작 ---
+    // 2. HLS 스트림 주소를 '/live' 경로로 고정 (하드코딩)
+    // MediaMTX 서버 IP와 포트가 올바른지 확인하세요.
+    var hlsUrl = 'http://192.168.0.236:28888/live/index.m3u8';
+
+    console.log("Attempting to play hardcoded HLS stream:", hlsUrl);
+
+    // --- 3. 인증 정보 설정 ---
     var username = 'its_cctv';      // mediamtx.yml에 설정한 사용자 이름
     var password = 'qwer1234!@';  // mediamtx.yml에 설정한 비밀번호
-
-    // Basic Authentication 헤더 값 생성
-    // btoa()는 문자열을 Base64로 인코딩하는 브라우저 내장 함수입니다.
     var authHeaderValue = 'Basic ' + btoa(username + ':' + password);
     // --- 인증 정보 설정 끝 ---
 
     if (Hls.isSupported()) {
-        // --- [수정] HLS.js 설정 객체 생성 ---
+        // HLS.js 설정 객체 생성 (인증 헤더 포함)
         var hlsConfig = {
-            // xhrSetup 콜백 함수를 사용하여 모든 XHR(HTTP) 요청에 헤더를 추가합니다.
             xhrSetup: function(xhr, url) {
                 xhr.setRequestHeader('Authorization', authHeaderValue);
             }
         };
-        // --- 설정 객체 생성 끝 ---
 
-        var hls = new Hls(hlsConfig); // 설정 객체와 함께 Hls 인스턴스 생성
+        var hls = new Hls(hlsConfig); // 설정과 함께 Hls 인스턴스 생성
 
         hls.loadSource(hlsUrl);
         hls.attachMedia(video);
+
         hls.on(Hls.Events.MANIFEST_PARSED, function() {
             console.log("Manifest parsed, attempting to play video.");
-            video.play().catch(e => console.error("Autoplay failed:", e));
+            video.play().catch(e => console.error("Autoplay failed. The browser may have blocked it. Please click play manually.", e));
         });
+
         hls.on(Hls.Events.ERROR, function (event, data) {
+            console.error('HLS.js error:', data);
             if (data.fatal) {
-                switch(data.type) {
-                    case Hls.ErrorTypes.NETWORK_ERROR:
-                        // 401 Unauthorized 오류는 여기에 해당될 수 있습니다.
-                        console.error('Fatal network error encountered:', data);
-                        if (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR && data.response && data.response.code === 401) {
-                            console.error("Authentication failed (401 Unauthorized). Please check username and password in your HTML file.");
-                        }
-                        break;
-                    case Hls.ErrorTypes.MEDIA_ERROR:
-                        console.error('Fatal media error encountered:', data);
-                        hls.recoverMediaError();
-                        break;
-                    default:
-                        hls.destroy();
-                        break;
+                if (data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
+                    if (data.response && data.response.code === 401) {
+                        console.error("Authentication failed (401 Unauthorized). Please check username and password in this HTML file.");
+                    } else if (data.response && data.response.code === 404) {
+                        console.error("Stream not found (404 Not Found). Please check if the 'live' path is active on MediaMTX.");
+                    }
                 }
             }
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // 중요: Safari 브라우저의 네이티브 HLS 재생은 커스텀 헤더 추가를 지원하지 않습니다.
-        // 이 경우에는 MediaMTX에서 해당 경로를 인증 없이 공개하거나,
-        // URL에 토큰을 추가하는 방식 등 다른 인증 방식을 사용해야 합니다.
-        console.warn("Native HLS playback (like in Safari) does not support custom Authorization headers. Playback might fail if authentication is required.");
+        // Safari 네이티브 HLS 재생 (커스텀 헤더 추가 불가, 인증 시 재생 실패 가능성 높음)
+        console.warn("Native HLS playback (like in Safari) does not support custom Authorization headers. Playback will likely fail if authentication is required.");
         video.src = hlsUrl;
         video.addEventListener('loadedmetadata', function() {
             video.play().catch(e => console.error("Autoplay failed:", e));
